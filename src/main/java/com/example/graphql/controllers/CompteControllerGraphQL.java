@@ -1,6 +1,8 @@
 package com.example.graphql.controllers;
 
 import com.example.graphql.entities.Compte;
+import com.example.graphql.entities.TypeCompte;
+import com.example.graphql.inputs.CompteInput;
 import com.example.graphql.repositories.CompteRepository;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -30,9 +32,23 @@ public class CompteControllerGraphQL {
     }
 
     @MutationMapping
-    public Compte saveCompte(@Argument Compte compte) {
+    public Compte saveCompte(@Argument("compte") CompteInput compteInput) {
+        Compte compte = new Compte();
+        compte.setSolde(compteInput.getSolde());
+        compte.setDateCreation(compteInput.getDateCreation());
+
+        // Convert the String to TypeCompte
+        try {
+            compte.setType(TypeCompte.valueOf(compteInput.getType().toUpperCase()));
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException(String.format("Invalid type: %s. Allowed values are: %s",
+                    compteInput.getType(), List.of(TypeCompte.values())));
+        }
+
         return compteRepository.save(compte);
     }
+
+
 
     @QueryMapping
     public Map<String, Object> totalSolde() {
