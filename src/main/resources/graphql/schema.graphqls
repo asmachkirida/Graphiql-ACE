@@ -37,3 +37,34 @@ type SoldeStats {
   sum: Float
   average: Float
 }
+
+
+enum TypeTransaction {
+  DEPOT
+  RETRAIT
+}
+
+type Transaction {
+  id: ID
+  montant: Float
+  date: String
+  type: TypeTransaction
+  compte: Compte
+}
+
+input TransactionInput {
+  montant: Float
+  date: String
+  type: TypeTransaction
+  compteId: ID
+}
+
+extend type Mutation {
+  addTransaction(transaction: TransactionInput): Transaction
+}
+
+extend type Query {
+  allTransactions: [Transaction]
+  transactionById(id: ID): Transaction
+}
+
